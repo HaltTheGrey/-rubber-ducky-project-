@@ -25,13 +25,58 @@ class PomdoroTimer(ctk.CTk):
         self.time_left = 25 * 60
         self.is_running = False
         
-        # TODO: Create you UI elements here
         
+        # UI Elements
+        # Timer display label
+        self.timer_label = ctk.CTkLabel(
+            self,
+            text="25:00",
+            font=("Arial", 48, "bold")
+        )
+        self.timer_label.pack(pady=40)
+        
+        
+        self.start_Button = ctk.CTkButton(
+            self,
+            text = "Start",
+            command = self.Start_timer,
+            width=200,
+            height=40,
+            font=("Arial", 16)
+        )
+        self.start_Button.pack(pady=10)
+        
+        self.reset_Button = ctk.CTkButton(
+            self,
+            text = "Reset",
+            command= self.Reset_timer,
+            width=200,
+            height=40,
+            font=("Arial", 16)
+        )
+        self.reset_Button.pack(pady=10)
+
     def Start_timer(self):
-        # TODO: Implement timer logic
-        pass
+        if not self.is_running:
+            self.is_running = True
+            self.start_Button.configure(text="Pause")
+            self.countdown()
+        else:
+            self.is_running = False
+            self.start_Button.configure(text = "Start")
+    def countdown(self):
+        if self.is_running and self.time_left > 0:
+            # Calculate minutes and seconds
+            minutes, seconds = divmod(self.time_left, 60)
+            self.timer_label.configure(text=f"{minutes:02}:{seconds:02}")
+            self.time_left -= 1
+            self.after(1000, self.countdown)
+        elif self.time_left == 0:
+            self.timer_label.configure(text="Time's up!")
+            self.is_running = False
+            self.start_Button.configure(text="Start")
     
-    def reset_timer(self):
+    def Reset_timer(self):
         # TODO: Reset to default time
         pass
     
