@@ -77,8 +77,10 @@ class PomdoroTimer(ctk.CTk):
             self.start_Button.configure(text="Start")
     
     def Reset_timer(self):
-        # TODO: Reset to default time
-        pass
+        self.time_left = 25 * 60
+        self.is_running = False
+        self.timer_label.configure(text="25:00")
+        self.start_Button.configure(text="Start")
     
     
     
