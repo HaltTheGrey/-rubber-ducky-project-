@@ -21,6 +21,8 @@ class PomdoroTimer(ctk.CTk):
         self.title("focus timer")
         self.geometry("400x300")
         
+        self.toaster = ToastNotifier()
+        
         # Timer state
         self.set_time = int(input("set this timer"))  # in minutes
         self.time_left = self.set_time * 60
@@ -76,22 +78,24 @@ class PomdoroTimer(ctk.CTk):
             self.timer_label.configure(text="Time's up!")
             self.is_running = False
             self.start_Button.configure(text="Start")
+            self.show_notifiication()  # Add this line
     def show_notifiication(self):
         """Show a Windows notification when the timer ends."""
         threading.Thread(
             target=self.toaster.show_toast,
-            args=(
-                "Pomodoro Timer",
-                "Time's up! Take a break.",
-                5, # duration in seconds
-            ),
+            kwargs={
+                "title" : "Pomodoro Timer",
+                "msg" : "Time's up! Take a break.",
+                "duration" : 5, # duration in seconds
+                "icon_path" : None
+            },
             daemon=True
         ).start()
         
     def Reset_timer(self):
         self.time_left = self.set_time * 60
         self.is_running = False
-        self.timer_label.configure(text="25:00")
+        self.timer_label.configure(text=f"{self.set_time:02}:00")
         self.start_Button.configure(text="Start")
     
     
