@@ -3,6 +3,7 @@ import customtkinter as ctk
 from datetime import datetime
 import threading
 import time
+from win10toast import ToastNotifier
 
 """
 this is my sandbox for all of my thoughts, AI will help me sort out and teach me all the necessary
@@ -20,17 +21,19 @@ class PomdoroTimer(ctk.CTk):
         self.title("focus timer")
         self.geometry("400x300")
         
-        # Timer state
+        self.toaster = ToastNotifier()
         
-        self.time_left = 25 * 60
+        # Timer state
+        self.set_time = int(input("set this timer"))  # in minutes
+        self.time_left = self.set_time * 60
         self.is_running = False
         
         
         # UI Elements
-        # Timer display label
+        # Timer display labels
         self.timer_label = ctk.CTkLabel(
             self,
-            text="25:00",
+            text="{set_time:02}:00".format(set_time=self.set_time),
             font=("Arial", 48, "bold")
         )
         self.timer_label.pack(pady=40)
@@ -75,11 +78,24 @@ class PomdoroTimer(ctk.CTk):
             self.timer_label.configure(text="Time's up!")
             self.is_running = False
             self.start_Button.configure(text="Start")
-    
+            self.show_notifiication()  # Add this line
+    def show_notifiication(self):
+        """Show a Windows notification when the timer ends."""
+        threading.Thread(
+            target=self.toaster.show_toast,
+            kwargs={
+                "title" : "Pomodoro Timer",
+                "msg" : "Time's up! Take a break.",
+                "duration" : 5, # duration in seconds
+                "icon_path" : None
+            },
+            daemon=True
+        ).start()
+        
     def Reset_timer(self):
-        self.time_left = 25 * 60
+        self.time_left = self.set_time * 60
         self.is_running = False
-        self.timer_label.configure(text="25:00")
+        self.timer_label.configure(text=f"{self.set_time:02}:00")
         self.start_Button.configure(text="Start")
     
     
