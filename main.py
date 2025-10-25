@@ -19,24 +19,50 @@ class PomdoroTimer(ctk.CTk):
         # Window makeup
         
         self.title("focus timer")
-        self.geometry("400x300")
+        self.geometry("400x400")
         
         self.toaster = ToastNotifier()
         
         # Timer state
-        self.set_time = int(input("set this timer"))  # in minutes
+        self.set_time = 25
         self.time_left = self.set_time * 60
         self.is_running = False
         
         
         # UI Elements
         # Timer display labels
+        self.timer_input_label = ctk.CTkLabel(
+            self,
+            text="Set Timer (minutes):",
+            font=("Arial", 14)
+        )
+        self.timer_input_label.pack(pady=(20, 5))
+        self.time_input = ctk.CTkEntry(
+            self,
+            width=200,
+            height=35,
+            font=("Arial", 14),
+            justify="center"
+        )
+        self.time_input.pack(pady=5)
+        self.time_input.insert(0, "25")
+        
+        self.set_button = ctk.CTkButton(
+            self,
+            text="Set Time",
+            command=self.update_timer,
+            width=200,
+            height=35,
+            font=("Arial", 14)
+        )
+        self.set_button.pack(pady=10)
+        
         self.timer_label = ctk.CTkLabel(
             self,
-            text="{set_time:02}:00".format(set_time=self.set_time),
-            font=("Arial", 48, "bold")
+            text=f"{self.set_time:02}:00",
+            font=("Arial", 48)
         )
-        self.timer_label.pack(pady=40)
+        self.timer_label.pack(pady=20)
         
         
         self.start_Button = ctk.CTkButton(
@@ -58,7 +84,17 @@ class PomdoroTimer(ctk.CTk):
             font=("Arial", 16)
         )
         self.reset_Button.pack(pady=10)
-
+    def update_timer(self):
+        try:
+            new_time = int(self.time_input.get())
+            if new_time <= 0:
+                raise ValueError("Time must be positive.")
+            self.set_time = new_time
+            self.time_left = self.set_time * 60
+            self.timer_label.configure(text=f"{self.set_time:02}:00")
+        except ValueError:
+            self.time_input.delete(0, ctk.END)
+            self.time_input.insert(0, "25")  # Reset to default if invalid input
     def Start_timer(self):
         if not self.is_running:
             self.is_running = True
