@@ -114,8 +114,8 @@ class PomdoroTimer(ctk.CTk):
             self.timer_label.configure(text="Time's up!")
             self.is_running = False
             self.start_Button.configure(text="Start")
-            self.show_notifiication()  # Add this line
-    def show_notifiication(self):
+            self.show_notification()  # Add this line
+    def show_notification(self):
         """Show a Windows notification when the timer ends."""
         threading.Thread(
             target=self.toaster.show_toast,
