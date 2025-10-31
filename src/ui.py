@@ -15,11 +15,15 @@ class PomodoroTimerApp(ctk.CTk):
 
         # Window setup
         self.title("Focus Timer")
-        self.geometry("500x480")
+        self.geometry("500x620+100+50")
+        self.minsize(500, 600)
+        # move the window
+        
+        
         
         self.configure(fg_color="#F0F0F0")
         
-        self.resizable(False, False)
+        
                 # Set window icon
         icon_path = os.path.join(
             os.path.dirname(__file__),
@@ -34,45 +38,84 @@ class PomodoroTimerApp(ctk.CTk):
         self._create_widgets()
         
     def _set_preset_time(self, minutes):
-            """Set timer to a preset time value"""
-            # Update the input field
-            self.time_input.delete(0, ctk.END)  # Clear current value
-            self.time_input.insert(0, str(minutes))  # Insert new value
+        """Set timer to a preset time value"""
+        # Update the input field
+        self.time_input.delete(0, ctk.END)  # Clear current value
+        self.time_input.insert(0, str(minutes))  # Insert new value
             
             # Apply the new time to the timer
-            self._update_timer()  # This calls your existing update method
+        self._update_timer()  # This calls your existing update method
             
     def _create_widgets(self):
         """Create all UI elements"""
         
-        # the various frames for layout
-        
-        main_frame = ctk.CTkFrame(self, fg_color="#26262D")
-        main_frame.pack(fill="both", expand=True)
-        """ Main container frame """
-        
-        side_timer_menu = ctk.CTkFrame(main_frame, width=200, fg_color="#383844")
-        side_timer_menu.pack(side="left", pady=20, padx = 20, fill="both", expand=True)
-        """ Timer side menu """
-        
-        preset_times_frame = ctk.CTkFrame(side_timer_menu, fg_color="#33363A")
-        preset_times_frame.pack(side="bottom", pady=10, padx = 10, fill = "both", expand=True)
-        """ Preset times frame """
-        
-        timer_frame = ctk.CTkFrame(main_frame, width=300, fg_color="#333B42")
-        timer_frame.pack(side="right", pady=20, padx = 20, fill="both", expand=True)
-        """ Main timer frame"""
-        
-        clock_frame = ctk.CTkFrame(timer_frame, width=300, height=200, fg_color="#FFFFFF")
-        clock_frame.pack(side="top", pady=20, padx = 20, fill="both")
+        # Main clock/calendar frame - SHOW THIS BY DEFAULT
+        self.main_clock_frame = ctk.CTkFrame(self, fg_color="#0A0606")
+        self.main_clock_frame.pack(pady=20, padx=20, fill="both", expand=True)
         """ Clock display frame """
         
+        self.analog_frame = ctk.CTkFrame(self.main_clock_frame, width=300, height=200, fg_color="#883434")
+        self.analog_frame.pack(side="top", pady=20, padx=20, fill="both", expand=True)
+        """ Analog Clock display frame """
+        
+        self.calendar_frame = ctk.CTkFrame(self.main_clock_frame, fg_color="#452626")
+        self.calendar_frame.pack(pady=20, padx=20, fill="both", expand=True)
+        """ Calendar display frame """
+        
+        self.menu_frame = ctk.CTkFrame(self.main_clock_frame, fg_color="#886161")
+        self.menu_frame.pack(pady=20, padx=20, fill="both", expand=True)
+        """ Menu frame """
+        
+        
+        # Timer frame section - CREATE BUT DON'T PACK IT
+        self.timer_main_frame = ctk.CTkFrame(self, fg_color="#26262D")
+        # REMOVE THIS LINE: self.timer_main_frame.pack(fill="both", expand=True)
+        # Don't pack it initially - it will be packed when toggle is clicked
+        """ Main container frame """
+        
+        self.side_timer_menu = ctk.CTkFrame(self.timer_main_frame, width=200, fg_color="#383844")
+        self.side_timer_menu.pack(side="left", pady=20, padx=20, fill="both", expand=True)
+        """ Timer side menu """
+        
+        self.preset_times_frame = ctk.CTkFrame(self.side_timer_menu, fg_color="#33363A")
+        self.preset_times_frame.pack(side="bottom", pady=10, padx = 10, fill = "both", expand=True)
+        """ Preset times frame """
+        
+        self.timer_frame = ctk.CTkFrame(self.timer_main_frame, width=300, fg_color="#333B42")
+        self.timer_frame.pack(side="right", pady=20, padx = 20, fill="both", expand=True)
+        """ Main timer frame"""
+        
+        # Timer display clock frame (keep this name)
+        self.timer_clock_frame = ctk.CTkFrame(self.timer_frame, width=300, height=200, fg_color="#FFFFFF")
+        self.timer_clock_frame.pack(side="top", pady=20, padx=20, fill="both")
+        """ Timer clock display frame """
+        
+        toggle_button = ctk.CTkButton(
+            self.timer_frame,  # Parent: timer_frame
+            text="Toggle Timer Frame",
+            command=self._toggle_timer_frame,
+            width=200,
+            height=40,
+            font=("Arial", 16)
+        )
+        toggle_button.pack(pady=10)
+        
+        # Button in menu_frame (main clock view)
+        self.toggle_button_main = ctk.CTkButton(
+            self.menu_frame,  # Parent: menu_frame
+            text="Show Timer",
+            command=self._toggle_timer_frame,
+            width=200,
+            height=40,
+            font=("Arial", 16)
+        )
+        self.toggle_button_main.pack(pady=10)
         # Preset time buttons
         preset_times = [15, 25, 30, 45, 60]
         
         for index, time in enumerate(preset_times):
             btn = ctk.CTkButton(
-                preset_times_frame,
+                self.preset_times_frame,
                 text=f"{time} min",
                 command=lambda t=time: self._set_preset_time(t),
                 height=30,
@@ -86,7 +129,7 @@ class PomodoroTimerApp(ctk.CTk):
             
         # Timer input section
         self.timer_input_label = ctk.CTkLabel(
-            side_timer_menu,
+            self.side_timer_menu,
             text="Set Timer (minutes):",
             font=("Arial", 14),
             text_color="white"
@@ -94,7 +137,7 @@ class PomodoroTimerApp(ctk.CTk):
         self.timer_input_label.pack(pady=(20, 5))
         
         self.time_input = ctk.CTkEntry(
-            side_timer_menu,
+            self.side_timer_menu,
             width=200,
             height=35,
             font=("Arial", 14),
@@ -104,7 +147,7 @@ class PomodoroTimerApp(ctk.CTk):
         self.time_input.insert(0, str(self.timer.set_time))
         
         self.set_button = ctk.CTkButton(
-            side_timer_menu,
+            self.side_timer_menu,
             text="Set Time",
             command=self._update_timer,
             width=200,
@@ -113,9 +156,9 @@ class PomodoroTimerApp(ctk.CTk):
         )
         self.set_button.pack(pady=10)
         
-        # Timer display
+        # Timer label goes in timer_clock_frame
         self.timer_label = ctk.CTkLabel(
-            clock_frame,
+            self.timer_clock_frame,  # Changed from self.clock_frame
             text=f"{self.timer.set_time:02}:00",
             font=("Arial", 48)
         )
@@ -123,7 +166,7 @@ class PomodoroTimerApp(ctk.CTk):
         
         # Control buttons
         self.start_button = ctk.CTkButton(
-            timer_frame,
+            self.timer_frame,
             text="Start",
             command=self._toggle_timer,
             width=200,
@@ -133,7 +176,7 @@ class PomodoroTimerApp(ctk.CTk):
         self.start_button.pack(pady=10)
         
         self.reset_button = ctk.CTkButton(
-            side_timer_menu,
+            self.side_timer_menu,
             text="Reset",
             command=self._reset_timer,
             width=200,
@@ -141,7 +184,31 @@ class PomodoroTimerApp(ctk.CTk):
             font=("Arial", 16)
         )
         self.reset_button.pack(pady=10)
-        
+    
+        # Button in timer frame (timer view)
+        self.toggle_button_timer = ctk.CTkButton(
+            self.side_timer_menu,  # Parent: side_timer_menu
+            text="Show Clock",
+            command=self._toggle_timer_frame,
+            width=200,
+            height=40,
+            font=("Arial", 16)
+        )
+        self.toggle_button_timer.pack(pady=10)
+    
+    def _toggle_timer_frame(self):
+        """Toggle visibility of the timer frame"""
+        if self.timer_main_frame.winfo_ismapped():
+            # Timer is showing, switch to clock
+            self.timer_main_frame.pack_forget()
+            self.main_clock_frame.pack(pady=20, padx=20, fill="both", expand=True)
+            self.toggle_button_main.configure(text="Show Timer")
+        else:
+            # Clock is showing, switch to timer
+            self.main_clock_frame.pack_forget()
+            self.timer_main_frame.pack(fill="both", expand=True)
+            self.toggle_button_main.configure(text="Show Clock")
+    
     def _update_timer(self):
         """Update timer with new duration"""
         try:
